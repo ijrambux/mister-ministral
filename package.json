@@ -1,0 +1,12 @@
+{
+  "name": "mister-ministral",
+  "version": "1.0.0",
+  "main": "api/chat.js",
+  "type": "module",
+  "scripts": {
+    "start": "node api/chat.js"
+  },
+  "dependencies": {
+    "node-fetch": "3.3.2"
+  }
+}
