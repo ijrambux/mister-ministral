@@ -2,14 +2,16 @@
 import { useState } from "react";
 
 export default function Home() {
-  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
+  const [messages, setMessages] = useState([]);
 
   async function sendMessage() {
     if (!input.trim()) return;
 
-    // أضف رسالة المستخدم
-    setMessages(prev => [...prev, { role: "user", content: input }]);
+    const userMessage = { role: "user", content: input };
+    setMessages((m) => [...m, userMessage]);
+
+    setInput("");
 
     const res = await fetch("/api/chat", {
       method: "POST",
@@ -18,62 +20,31 @@ export default function Home() {
 
     const data = await res.json();
 
-    // أضف رد الـ AI
-    setMessages(prev => [...prev, { role: "assistant", content: data.reply }]);
+    const botMessage = { role: "assistant", content: data.reply };
 
-    setInput("");
+    setMessages((m) => [...m, botMessage]);
   }
 
   return (
-    <main style={{ padding: 30, maxWidth: 700, margin: "0 auto" }}>
-      <h1 style={{ textAlign: "center" }}>🤖 Mister AI - Chat</h1>
+    <div style={{ padding: 20 }}>
+      <h1>Mister Ministral Chat</h1>
 
-      <div style={{
-        border: "1px solid #ddd",
-        padding: 20,
-        borderRadius: 10,
-        minHeight: 400,
-        marginTop: 20
-      }}>
-        {messages.map((m, i) => (
-          <div
-            key={i}
-            style={{
-              textAlign: m.role === "user" ? "right" : "left",
-              marginBottom: 12
-            }}
-          >
-            <b>{m.role === "user" ? "🧑 أنت" : "🤖 Mister AI"}</b>
-            <div>{m.content}</div>
-          </div>
+      <div style={{ height: "400px", overflowY: "auto", border: "1px solid #ccc", padding: 10 }}>
+        {messages.map((msg, i) => (
+          <p key={i}><b>{msg.role}:</b> {msg.content}</p>
         ))}
       </div>
 
-      <div style={{ marginTop: 20, display: "flex" }}>
-        <input
-          style={{
-            flex: 1,
-            padding: 10,
-            borderRadius: 8,
-            border: "1px solid #ccc"
-          }}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="اكتب رسالتك..."
-        />
-        <button
-          style={{
-            marginLeft: 10,
-            padding: "10px 20px",
-            borderRadius: 8,
-            background: "black",
-            color: "white"
-          }}
-          onClick={sendMessage}
-        >
-          إرسال
-        </button>
-      </div>
-    </main>
+      <input
+        style={{ width: "80%", padding: 10 }}
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        placeholder="اكتب رسالة..."
+      />
+
+      <button onClick={sendMessage} style={{ padding: 10 }}>
+        إرسال
+      </button>
+    </div>
   );
 }
